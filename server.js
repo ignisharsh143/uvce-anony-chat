@@ -5,7 +5,12 @@ const mongoose = require('mongoose');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIo(server);
+const io = socketIo(server, {
+    cors: {
+        origin: "*", // Allow connections from any origin
+        methods: ["GET", "POST"]
+    }
+});
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
@@ -38,8 +43,8 @@ const messageSchema = new mongoose.Schema({
         default: Date.now
     },
     reactions: {
-        like: { type: Number, default: 0 },
-        heart: { type: Number, default: 0 }
+        like: [String], // Store users who liked
+        heart: [String]  // Store users who hearted
     },
     reported: {
         type: Boolean,
@@ -147,18 +152,37 @@ io.on('connection', async (socket) => {
         
         try {
             const message = await Message.findById(messageId);
-            if (message && message.reactions[reaction] !== undefined) {
-                message.reactions[reaction]++;
-                await message.save();
-                
+            if (message && message.reactions[reaction]) {
+                // Add user to reaction array if not already present
+                if (!message.reactions[reaction].includes(user)) {
+                    message.reactions[reaction].push(user);
+
+                    // Also remove from the other reaction if present
+                    const otherReaction = reaction === 'like' ? 'heart' : 'like';
+                    const userIndex = message.reactions[otherReaction].indexOf(user);
+                    if (userIndex > -1) {
+                        message.reactions[otherReaction].splice(userIndex, 1);
+                    }
+
+                    await message.save();
+                }
+
+                // Emit updates for both reactions
                 io.emit('reaction updated', {
-                    messageId: messageId,
-                    reaction: reaction,
-                    count: message.reactions[reaction]
+                    messageId,
+                    reaction: 'like',
+                    count: message.reactions.like.length,
+                    users: message.reactions.like
+                });
+                io.emit('reaction updated', {
+                    messageId,
+                    reaction: 'heart',
+                    count: message.reactions.heart.length,
+                    users: message.reactions.heart
                 });
             }
         } catch (error) {
-            console.error('Error updating reaction:', error);
+            console.error('Error adding reaction:', error);
         }
     });
 
@@ -167,14 +191,18 @@ io.on('connection', async (socket) => {
         
         try {
             const message = await Message.findById(messageId);
-            if (message && message.reactions[reaction] !== undefined && message.reactions[reaction] > 0) {
-                message.reactions[reaction]--;
-                await message.save();
+            if (message && message.reactions[reaction]) {
+                const userIndex = message.reactions[reaction].indexOf(user);
+                if (userIndex > -1) {
+                    message.reactions[reaction].splice(userIndex, 1);
+                    await message.save();
+                }
                 
                 io.emit('reaction updated', {
-                    messageId: messageId,
-                    reaction: reaction,
-                    count: message.reactions[reaction]
+                    messageId,
+                    reaction,
+                    count: message.reactions[reaction].length,
+                    users: message.reactions[reaction]
                 });
             }
         } catch (error) {
@@ -242,7 +270,10 @@ io.on('connection', async (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
+server.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Anonymous Chat Server is running on port ${PORT}`);
-    console.log(`📱 Open http://localhost:${PORT} to start chatting!`);
+    console.log(`📱 Server is ready for connections!`);
+    if (process.env.NODE_ENV !== 'production') {
+        console.log(`🔗 Local URL: http://localhost:${PORT}`);
+    }
 });

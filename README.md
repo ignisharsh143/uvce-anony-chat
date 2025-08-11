@@ -140,10 +140,28 @@ npm start
 4. **HTTPS**: Use SSL certificate for secure connections
 
 ### Recommended Platforms
+- **Railway** (Recommended): Easy deployment with GitHub integration
 - **Heroku**: Easy deployment with Git
-- **Vercel**: Great for static sites with serverless functions
+- **Render**: Modern platform with free tier
 - **DigitalOcean**: Full control with droplets
-- **AWS**: Scalable cloud deployment
+
+### Railway Deployment (Step-by-Step)
+
+1. **Set up MongoDB Atlas** (Free Cloud Database):
+   - Go to [mongodb.com/atlas](https://www.mongodb.com/atlas)
+   - Create free account and cluster
+   - Get connection string (looks like: `mongodb+srv://username:password@cluster.mongodb.net/anony-chat`)
+
+2. **Deploy to Railway**:
+   - Connect your GitHub repository to Railway
+   - Add environment variable: `MONGODB_URI` = your MongoDB Atlas connection string
+   - Railway will automatically deploy your app
+
+3. **Environment Variables for Railway**:
+   ```
+   MONGODB_URI=mongodb+srv://your-connection-string
+   NODE_ENV=production
+   ```
 
 ## 📱 Browser Support
 

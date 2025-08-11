@@ -189,9 +189,11 @@ function displayMessage(data, isHistorical = false) {
         minute: '2-digit'
     });
     
-    // Get reaction counts from data if available
-    const likeCount = data.reactions ? data.reactions.like || 0 : 0;
-    const heartCount = data.reactions ? data.reactions.heart || 0 : 0;
+    // Get reaction counts and user reactions from data
+    const likeCount = data.reactions ? data.reactions.like.length : 0;
+    const heartCount = data.reactions ? data.reactions.heart.length : 0;
+    const userLiked = data.reactions ? data.reactions.like.includes(currentUser) : false;
+    const userHearted = data.reactions ? data.reactions.heart.includes(currentUser) : false;
     
     messageDiv.innerHTML = `
         <div class="message-header">
@@ -217,6 +219,14 @@ function displayMessage(data, isHistorical = false) {
         </div>
     `;
     
+    // Set initial active state for reaction buttons
+    if (userLiked) {
+        messageDiv.querySelector('[data-reaction="like"]').classList.add('active');
+    }
+    if (userHearted) {
+        messageDiv.querySelector('[data-reaction="heart"]').classList.add('active');
+    }
+
     // Add event listeners for reactions
     const reactionBtns = messageDiv.querySelectorAll('.reaction-btn');
     reactionBtns.forEach(btn => {
@@ -299,6 +309,13 @@ socket.on('reaction updated', (data) => {
         if (reactionBtn) {
             const countSpan = reactionBtn.querySelector('.count');
             countSpan.textContent = data.count;
+
+            // Update active state for the current user
+            if (data.users.includes(currentUser)) {
+                reactionBtn.classList.add('active');
+            } else {
+                reactionBtn.classList.remove('active');
+            }
         }
     }
 });
