@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Confessions - Anonymous Chat</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Terms and Conditions Modal -->
+    <div id="termsModal" class="modal">
+        <div class="modal-content">
+            <h2>🎓 Welcome to College Confessions</h2>
+            <div class="terms-text">
+                <h3>Community Guidelines</h3>
+                <ul>
+                    <li>🚫 No harassment, bullying, or hate speech</li>
+                    <li>🔒 No sharing of personal information (yours or others')</li>
+                    <li>💬 Keep conversations respectful and fun</li>
+                    <li>📱 No spam or excessive messaging</li>
+                    <li>🎯 Stay on topic - this is for college community discussions</li>
+                    <li>⚠️ Report inappropriate content using the flag button</li>
+                </ul>
+                <p><strong>Remember:</strong> Your identity is anonymous and changes each visit. Messages are automatically deleted after 24 hours.</p>
+            </div>
+            <button id="agreeBtn" class="agree-btn">I Agree - Let's Chat! 🚀</button>
+        </div>
+    </div>
+
+    <!-- Main Chat Interface -->
+    <div id="chatContainer" class="chat-container hidden">
+        <header class="chat-header">
+            <h1>🎓 College Confessions</h1>
+            <div class="user-info">
+                <span id="userIdentity">Anonymous Student</span>
+                <span class="online-count">Online: <span id="onlineCount">1</span></span>
+            </div>
+        </header>
+
+        <div id="messagesContainer" class="messages-container">
+            <div class="welcome-message">
+                <p>🎉 Welcome to the anonymous chat! Share your thoughts, confessions, or just chat with fellow students.</p>
+                <p>💡 <strong>Tip:</strong> React to messages with 👍 or ❤️ instead of replying to keep things positive!</p>
+            </div>
+        </div>
+
+        <div class="input-container">
+            <div class="input-wrapper">
+                <input type="text" id="messageInput" placeholder="Share your thoughts anonymously..." maxlength="500">
+                <button id="sendBtn" class="send-btn">
+                    <span>Send</span>
+                    <span class="send-icon">📤</span>
+                </button>
+            </div>
+            <div class="char-counter">
+                <span id="charCount">0</span>/500
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Panel (Hidden by default) -->
+    <div id="adminPanel" class="admin-panel hidden">
+        <h3>🛡️ Moderation Panel</h3>
+        <div id="reportedMessages"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
