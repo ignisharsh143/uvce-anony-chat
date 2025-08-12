@@ -8,9 +8,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
-    "node": "18.x"
+    "node": "22.x"
   },
   "dependencies": {
+    "dotenv": "^17.2.1",
     "express": "^4.17.1",
     "mongoose": "^6.13.8",
     "socket.io": "^4.1.2"
